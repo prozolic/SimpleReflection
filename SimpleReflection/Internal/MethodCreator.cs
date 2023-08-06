@@ -14,10 +14,16 @@ namespace SimpleReflection.Internal
         public static (object method, DelegateType type) CreateStatic(Type target, string methodName, ArgsTypeArray argsTypeArray)
         {
             var methodInfo = GetMethodInfoFromType(target, methodName, argsTypeArray.Array);
-            return CreateStaticInternal(methodInfo);
+            return BuildStaticMethod(methodInfo);
         }
 
-        private static (object method, DelegateType type) CreateStaticInternal(MethodInfo methodInfo)
+        public static (object method, DelegateType type) Create<T>(T target, string methodName, ArgsTypeArray argsTypeArray)
+        {
+            var methodInfo = GetMethodInfo(target, methodName, argsTypeArray.Array);
+            return BuildMethod(target, methodInfo);
+        }
+
+        private static (object method, DelegateType type) BuildStaticMethod(MethodInfo methodInfo)
         {
             ErrorHelper.ThrowNullReferenceException(methodInfo, "Failed to get method information.");
 
@@ -48,12 +54,6 @@ namespace SimpleReflection.Internal
                     args).Compile();
                 return (lambda, DelegateType.Function);
             }
-        }
-
-        public static (object method, DelegateType type) Create<T>(T target, string methodName, ArgsTypeArray argsTypeArray)
-        {
-            var methodInfo = GetMethodInfo(target, methodName, argsTypeArray.Array);
-            return BuildMethod(target, methodInfo);
         }
 
         private static (object method, DelegateType type) BuildMethod<T>(T target, MethodInfo methodInfo)
