@@ -1,7 +1,7 @@
 ﻿
 namespace SimpleReflection.Internal
 {
-    public sealed class ArgsTypeResolver
+    public sealed class ArgsTypeArrayResolver
     {
         public static ArgsTypeArray ResolveRealParameter(params object[]? args)
         {

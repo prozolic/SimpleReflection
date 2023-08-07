@@ -4,39 +4,169 @@ namespace SimpleReflection
 {
     public static class Extensions
     {
-        public static object? ExecuteInvoker<T>(this T target, MethodInvoker invoker, params object[] args)
+        public static ActionInvoker GenerateAction(this Type target, string methodName)
+        {
+            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
+
+            var m = MethodCreator.CreateInstance(target, methodName);
+            return new ActionInvoker(m.method);
+        }
+
+        public static ActionInvoker GenerateAction<T>(this T target, string methodName)
+        {
+            return target.GetType().GenerateAction(methodName);
+        }
+
+        public static ActionInvoker GenerateActionArgs(this Type target, string methodName, ArgsTypeArray argsTypeArray)
+        {
+            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
+
+            var m = MethodCreator.CreateInstance(target, methodName, argsTypeArray);
+            return new ActionInvoker(m.method);
+        }
+
+        public static ActionInvoker GenerateActionArgs<T>(this T target, string methodName, ArgsTypeArray argsTypeArray)
+        {
+            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
+
+            var m = MethodCreator.CreateInstance(target.GetType(), methodName, argsTypeArray);
+            return new ActionInvoker(m.method);
+        }
+
+        public static FunctionInvoker GenerateFunction(this Type target, string methodName)
+        {
+            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
+
+            var m = MethodCreator.CreateInstance(target, methodName);
+            return new FunctionInvoker(m.method);
+        }
+
+        public static FunctionInvoker GenerateFunction<T>(this T target, string methodName)
+        {
+            return target.GetType().GenerateFunction(methodName);
+        }
+
+        public static FunctionInvoker GenerateFunctionArgs(this Type target, string methodName, ArgsTypeArray argsTypeArray)
+        {
+            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
+
+            var m = MethodCreator.CreateInstance(target, methodName, argsTypeArray);
+            return new FunctionInvoker(m.method);
+        }
+
+        public static FunctionInvoker GenerateFunctionArgs<T>(this T target, string methodName, ArgsTypeArray argsTypeArray)
+        {
+            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
+
+            var m = MethodCreator.CreateInstance(target.GetType(), methodName, argsTypeArray);
+            return new FunctionInvoker(m.method);
+        }
+
+        public static StaticActionInvoker GenerateStaticAction(this Type target, string methodName)
+        {
+            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
+
+            var m = MethodCreator.CreateStatic(target, methodName);
+            return new StaticActionInvoker(m.method);
+        }
+
+        public static StaticActionInvoker GenerateStaticActionArgs(this Type target, string methodName, ArgsTypeArray argsTypeArray)
+        {
+            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
+
+            var m = MethodCreator.CreateStatic(target, methodName, argsTypeArray);
+            return new StaticActionInvoker(m.method);
+        }
+
+        public static StaticFunctionInvoker GenerateStaticFunction(this Type target, string methodName)
+        {
+            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
+
+            var m = MethodCreator.CreateStatic(target, methodName);
+            return new StaticFunctionInvoker(m.method);
+        }
+
+        public static StaticFunctionInvoker GenerateStaticFunctionArgs(this Type target, string methodName, ArgsTypeArray argsTypeArray)
+        {
+            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
+
+            var m = MethodCreator.CreateStatic(target, methodName, argsTypeArray);
+            return new StaticFunctionInvoker(m.method);
+        }
+
+        public static void InvokeAction<T>(this T target, ActionInvoker invoker, params object[] args)
+        {
+            ErrorHelper.ThrowArgumentNullException(invoker, nameof(invoker));
+
+            invoker.Invoke(target, args);
+        }
+
+        public static object? InvokeFunction<T>(this T target, FunctionInvoker invoker, params object[] args)
         {
             ErrorHelper.ThrowArgumentNullException(invoker, nameof(invoker));
 
             return invoker.Invoke(target, args);
         }
-        public static object? ExecuteStaticInvoker(this MethodInvoker invoker, params object[] args)
+
+        public sealed class ActionInvoker
         {
-            return invoker.Invoke(args);
+            private readonly Action<object, object[]?> _action;
+
+            internal ActionInvoker(object action)
+            {
+                _action = (Action<object, object[]?>)action;
+            }
+
+            public void Invoke<T>(T target, params object[]? parameters)
+            {
+                _action.Invoke(target, parameters);
+            }
         }
 
-        public static MethodInvoker GenerateMethod<T>(this T target, string methodName)
+        public sealed class StaticActionInvoker
         {
-            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
+            private readonly Action<object[]?> _action;
 
-            return MethodInvoker.CreateInstance(target, methodName);
+            internal StaticActionInvoker(object action)
+            {
+                _action = (Action<object[]?>)action;
+            }
+
+            public void Invoke(params object[]? parameters)
+            {
+                _action.Invoke(parameters);
+            }
         }
 
-        public static MethodInvoker GenerateMethodArgs<T>(this T target, string methodName, ArgsTypeArray argsTypeArray)
+        public sealed class FunctionInvoker
         {
-            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
+            private readonly Func<object, object[]?, object> _function;
 
-            return MethodInvoker.CreateInstance(target, methodName, argsTypeArray);
+            internal FunctionInvoker(object function)
+            {
+                _function = (Func<object, object[]?, object>)function;
+            }
+
+            public object? Invoke<T>(T target, params object[]? parameters)
+            {
+                return _function.Invoke(target, parameters);
+            }
         }
 
-        public static MethodInvoker GenerateStaticMethod(this Type target, string methodName)
+        public sealed class StaticFunctionInvoker
         {
-            return MethodInvoker.CreateStatic(target, methodName);
+            private readonly Func<object[]?, object> _function;
+
+            internal StaticFunctionInvoker(object function)
+            {
+                _function = (Func<object[]?, object>)function;
+            }
+
+            public object? Invoke(params object[]? parameters)
+            {
+                return _function.Invoke(parameters);
+            }
         }
 
-        public static MethodInvoker GenerateStaticMethodArgs(this Type target, string methodName, ArgsTypeArray argsTypeArray)
-        {
-            return MethodInvoker.CreateStatic(target, methodName, argsTypeArray);
-        }
     }
 }
