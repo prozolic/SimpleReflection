@@ -13,60 +13,47 @@ namespace SimpleReflection.Internal
 
         public static (object method, DelegateType type) CreateStatic(Type target, string methodName)
         {
-            var methodInfo = GetMethodInfoFromType(
-                target,
+            var methodInfo = target.GetMethod(
                 methodName,
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+
             return BuildStaticMethod(methodInfo);
         }
 
         public static (object method, DelegateType type) CreateStatic(Type target, string methodName, ArgsTypeArray argsTypeArray)
         {
-            var methodInfo = GetMethodInfoFromType(
-                target, 
-                methodName, 
-                argsTypeArray.Array, 
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            var methodInfo = target.GetMethod(
+                methodName,
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static,
+                null, argsTypeArray.Array ?? ArgsTypeArray.Empty.Array, null);
+
             return BuildStaticMethod(methodInfo);
         }
 
         public static (object method, DelegateType type) CreateInstance(Type target, string methodName)
         {
-            var methodInfo = GetMethodInfoFromType(
-                target,
+            var methodInfo = target.GetMethod(
                 methodName,
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            ErrorHelper.ThrowNullReferenceException(methodInfo, "Failed to get method information.");
+
             return BuildMethod(target, methodInfo);
         }
 
         public static (object method, DelegateType type) CreateInstance(Type target, string methodName, ArgsTypeArray argsTypeArray)
         {
-            var methodInfo = GetMethodInfoFromType(
-                target,
+            var methodInfo = target.GetMethod(
                 methodName,
-                argsTypeArray.Array,
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
+                null, argsTypeArray.Array ?? ArgsTypeArray.Empty.Array, null);
+
+            ErrorHelper.ThrowNullReferenceException(methodInfo, "Failed to get method information.");
+
             return BuildMethod(target, methodInfo);
         }
 
-        private static MethodInfo? GetMethodInfoFromType(Type target, string methodName, Type[]? argsTypes, BindingFlags flags)
-        {
-            var methodInfo = target.GetMethod(
-                methodName,
-                flags,
-                null, argsTypes ?? new Type[] { }, null);
-            return methodInfo;
-        }
-
-        private static MethodInfo? GetMethodInfoFromType(Type target, string methodName, BindingFlags flags)
-        {
-            var methodInfo = target.GetMethod(
-                methodName,
-                flags);
-            return methodInfo;
-        }
-
-        private static (object method, DelegateType type) BuildStaticMethod(MethodInfo methodInfo)
+        public static (object method, DelegateType type) BuildStaticMethod(MethodInfo? methodInfo)
         {
             ErrorHelper.ThrowNullReferenceException(methodInfo, "Failed to get method information.");
 
@@ -99,10 +86,8 @@ namespace SimpleReflection.Internal
             }
         }
 
-        private static (object method, DelegateType type) BuildMethod(Type target, MethodInfo methodInfo)
+        public static (object method, DelegateType type) BuildMethod(Type target, MethodInfo? methodInfo)
         {
-            ErrorHelper.ThrowNullReferenceException(methodInfo, "Failed to get method information.");
-
             var instance = _instanceParameter;
             var args = _argsParameter;
             var ps = methodInfo.GetParameters().Select((x, index) =>

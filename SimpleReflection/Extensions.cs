@@ -107,6 +107,41 @@ namespace SimpleReflection
 
             return invoker.Invoke(target, args);
         }
+        public static PropertyGetInvoker GenerateGetProperty(this Type target, string propertyName)
+        {
+            var getProperty = PropertyCreator.CreateGetProperty(target, propertyName);
+            return new PropertyGetInvoker(new FunctionInvoker(getProperty));
+        }
+
+        public static PropertyGetInvoker GenerateGetProperty<T>(this T target, string propertyName)
+        {
+            return target.GetType().GenerateGetProperty(propertyName);
+        }
+
+        public static object? InvokePropertyGet<T>(this T target, PropertyGetInvoker invoker)
+        {
+            ErrorHelper.ThrowArgumentNullException(invoker, nameof(invoker));
+
+            return invoker.Invoke(target);
+        }
+
+        public static PropertySetInvoker GenerateSetProperty(this Type target, string propertyName)
+        {
+            var getProperty = PropertyCreator.CreateSetProperty(target, propertyName);
+            return new PropertySetInvoker(new ActionInvoker(getProperty));
+        }
+
+        public static PropertySetInvoker GenerateSetProperty<T>(this T target, string propertyName)
+        {
+            return target.GetType().GenerateSetProperty(propertyName);
+        }
+
+        public static void InvokePropertySet<T>(this T target, PropertySetInvoker invoker, object? value)
+        {
+            ErrorHelper.ThrowArgumentNullException(invoker, nameof(invoker));
+
+            invoker.Invoke(target, value);
+        }
 
         public sealed class ActionInvoker
         {
@@ -165,6 +200,36 @@ namespace SimpleReflection
             public object? Invoke(params object[]? parameters)
             {
                 return _function.Invoke(parameters);
+            }
+        }
+
+        public sealed class PropertyGetInvoker
+        {
+            private readonly FunctionInvoker _getter;
+
+            internal PropertyGetInvoker(FunctionInvoker getter)
+            {
+                _getter = getter;
+            }
+
+            public object? Invoke<T>(T target)
+            {
+                return _getter.Invoke(target, null);
+            }
+        }
+
+        public sealed class PropertySetInvoker
+        {
+            private readonly ActionInvoker _setter;
+
+            internal PropertySetInvoker(ActionInvoker getter)
+            {
+                _setter = getter;
+            }
+
+            public void Invoke<T>(T target, object? value)
+            {
+                _setter.Invoke(target, value);
             }
         }
 
