@@ -107,40 +107,95 @@ namespace SimpleReflection
 
             return invoker.Invoke(target, args);
         }
-        public static PropertyGetInvoker GenerateGetProperty(this Type target, string propertyName)
+
+        public static GetPropertyInvoker GenerateGetProperty(this Type target, string propertyName)
         {
             var getProperty = PropertyCreator.CreateGetProperty(target, propertyName);
-            return new PropertyGetInvoker(new FunctionInvoker(getProperty));
+            return new GetPropertyInvoker(new FunctionInvoker(getProperty));
         }
 
-        public static PropertyGetInvoker GenerateGetProperty<T>(this T target, string propertyName)
+        public static GetPropertyInvoker GenerateGetProperty<T>(this T target, string propertyName)
         {
             return target.GetType().GenerateGetProperty(propertyName);
         }
 
-        public static object? InvokePropertyGet<T>(this T target, PropertyGetInvoker invoker)
+        public static IndexedGetPropertyInvoker GenerateIndexedGetProperty<T>(this T target)
+        {
+            return target.GetType().GenerateIndexedGetProperty();
+        }
+
+        public static IndexedGetPropertyInvoker GenerateIndexedGetProperty(this Type target)
+        {
+            var indexerName = IndexerExtractor.Extract(target);
+            var getIndexer = PropertyCreator.CreateGetProperty(target, indexerName);
+            return new IndexedGetPropertyInvoker(new FunctionInvoker(getIndexer));
+        }
+
+        public static IndexedSetPropertyInvoker GenerateIndexedSetProperty<T>(this T target)
+        {
+            return target.GetType().GenerateIndexedSetProperty();
+        }
+
+        public static IndexedSetPropertyInvoker GenerateIndexedSetProperty(this Type target)
+        {
+            var indexerName = IndexerExtractor.Extract(target);
+            var setIndexer = PropertyCreator.CreateSetProperty(target, indexerName);
+            return new IndexedSetPropertyInvoker(new ActionInvoker(setIndexer));
+        }
+
+        public static SetPropertyInvoker GenerateSetProperty(this Type target, string propertyName)
+        {
+            var getProperty = PropertyCreator.CreateSetProperty(target, propertyName);
+            return new SetPropertyInvoker(new ActionInvoker(getProperty));
+        }
+
+        public static SetPropertyInvoker GenerateSetProperty<T>(this T target, string propertyName)
+        {
+            return target.GetType().GenerateSetProperty(propertyName);
+        }
+
+        public static StaticGetPropertyInvoker GenerateStaticGetProperty(this Type target, string propertyName)
+        {
+            var getProperty = PropertyCreator.CreateStaticGetProperty(target, propertyName);
+            return new StaticGetPropertyInvoker(new StaticFunctionInvoker(getProperty));
+        }
+
+        public static StaticSetPropertyInvoker GenerateStaticSetProperty(this Type target, string propertyName)
+        {
+            var getProperty = PropertyCreator.CreateStaticSetProperty(target, propertyName);
+            return new StaticSetPropertyInvoker(new StaticActionInvoker(getProperty));
+        }
+
+        public static object? InvokeGetProperty<T>(this T target, GetPropertyInvoker invoker)
         {
             ErrorHelper.ThrowArgumentNullException(invoker, nameof(invoker));
 
             return invoker.Invoke(target);
         }
 
-        public static PropertySetInvoker GenerateSetProperty(this Type target, string propertyName)
-        {
-            var getProperty = PropertyCreator.CreateSetProperty(target, propertyName);
-            return new PropertySetInvoker(new ActionInvoker(getProperty));
-        }
-
-        public static PropertySetInvoker GenerateSetProperty<T>(this T target, string propertyName)
-        {
-            return target.GetType().GenerateSetProperty(propertyName);
-        }
-
-        public static void InvokePropertySet<T>(this T target, PropertySetInvoker invoker, object? value)
+        public static void InvokeSetProperty<T>(this T target, SetPropertyInvoker invoker, object? value)
         {
             ErrorHelper.ThrowArgumentNullException(invoker, nameof(invoker));
 
             invoker.Invoke(target, value);
+        }
+
+        public static object? InvokeIndexedGetProperty<T>(this T target, IndexedGetPropertyInvoker invoker, params object[]? indexerParameters)
+        {
+            ErrorHelper.ThrowArgumentNullException(invoker, nameof(invoker));
+            ErrorHelper.ThrowArgumentNullException(indexerParameters, nameof(indexerParameters));
+            ErrorHelper.ThrowNoElementInArray(indexerParameters);
+
+            return invoker.Invoke(target, indexerParameters);
+        }
+
+        public static void InvokeIndexedSetProperty<T>(this T target, IndexedSetPropertyInvoker invoker, object? value, params object[]? indexerParameters)
+        {
+            ErrorHelper.ThrowArgumentNullException(invoker, nameof(invoker));
+            ErrorHelper.ThrowArgumentNullException(indexerParameters, nameof(indexerParameters));
+            ErrorHelper.ThrowNoElementInArray(indexerParameters);
+
+            invoker.Invoke(target, indexerParameters, value);
         }
 
         public sealed class ActionInvoker
@@ -203,11 +258,11 @@ namespace SimpleReflection
             }
         }
 
-        public sealed class PropertyGetInvoker
+        public sealed class GetPropertyInvoker
         {
             private readonly FunctionInvoker _getter;
 
-            internal PropertyGetInvoker(FunctionInvoker getter)
+            internal GetPropertyInvoker(FunctionInvoker getter)
             {
                 _getter = getter;
             }
@@ -218,11 +273,11 @@ namespace SimpleReflection
             }
         }
 
-        public sealed class PropertySetInvoker
+        public sealed class SetPropertyInvoker
         {
             private readonly ActionInvoker _setter;
 
-            internal PropertySetInvoker(ActionInvoker getter)
+            internal SetPropertyInvoker(ActionInvoker getter)
             {
                 _setter = getter;
             }
@@ -230,6 +285,66 @@ namespace SimpleReflection
             public void Invoke<T>(T target, object? value)
             {
                 _setter.Invoke(target, value);
+            }
+        }
+
+        public sealed class StaticGetPropertyInvoker
+        {
+            private readonly StaticFunctionInvoker _getter;
+
+            internal StaticGetPropertyInvoker(StaticFunctionInvoker getter)
+            {
+                _getter = getter;
+            }
+
+            public object? Invoke()
+            {
+                return _getter.Invoke(null);
+            }
+        }
+
+        public sealed class StaticSetPropertyInvoker
+        {
+            private readonly StaticActionInvoker _setter;
+
+            internal StaticSetPropertyInvoker(StaticActionInvoker getter)
+            {
+                _setter = getter;
+            }
+
+            public void Invoke(object? value)
+            {
+                _setter.Invoke(value);
+            }
+        }
+
+        public sealed class IndexedGetPropertyInvoker
+        {
+            private readonly FunctionInvoker _getter;
+
+            internal IndexedGetPropertyInvoker(FunctionInvoker getter)
+            {
+                _getter = getter;
+            }
+
+            public object? Invoke<T>(T target, params object[]? indexerParameters)
+            {
+                return _getter.Invoke(target, indexerParameters);
+            }
+        }
+
+        public sealed class IndexedSetPropertyInvoker
+        {
+            public readonly ActionInvoker _setter;
+
+            internal IndexedSetPropertyInvoker(ActionInvoker setter)
+            {
+                _setter = setter;
+            }
+
+            public void Invoke<T>(T target, object? value, params object[]? indexerParameters)
+            {
+                _setter.Invoke(target, indexerParameters, value);
             }
         }
 
