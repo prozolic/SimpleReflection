@@ -20,6 +20,12 @@ namespace SimpleReflection.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ThrowArgumentNullException(string value, string errorText)
+        {
+            if (string.IsNullOrWhiteSpace(value)) throw new ArgumentNullException(errorText);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ThrowNoElementInArray<T>(T[] value)
         {
             if (value.Length == 0) throw new InvalidOperationException("There is no element of anything.");
