@@ -8,7 +8,7 @@ namespace SimpleReflection
     {
         private readonly Type[] argsTypes;
 
-        public static readonly ArgsTypeArray Empty = new ArgsTypeArray(new Type[] { });
+        public static readonly ArgsTypeArray Empty = new (System.Array.Empty<Type>());
 
         public Type[] Array => argsTypes;
 
@@ -16,7 +16,7 @@ namespace SimpleReflection
 
         public ArgsTypeArray(Type[] argsTypes)
         {
-            this.argsTypes = argsTypes;
+            this.argsTypes = argsTypes ?? Empty.Array;
         }
 
         public IEnumerator<Type> GetEnumerator()

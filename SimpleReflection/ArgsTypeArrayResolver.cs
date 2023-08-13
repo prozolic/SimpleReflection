@@ -1,6 +1,7 @@
 ﻿using System;
+using SimpleReflection.Internal;
 
-namespace SimpleReflection.Internal
+namespace SimpleReflection
 {
     public sealed class ArgsTypeArrayResolver
     {

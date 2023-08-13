@@ -25,7 +25,7 @@ namespace SimpleReflection.Internal
             var methodInfo = target.GetMethod(
                 methodName,
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static,
-                null, argsTypeArray.Array ?? ArgsTypeArray.Empty.Array, null);
+                null, argsTypeArray.Array, null);
 
             return BuildStaticMethod(methodInfo);
         }
@@ -46,7 +46,7 @@ namespace SimpleReflection.Internal
             var methodInfo = target.GetMethod(
                 methodName,
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
-                null, argsTypeArray.Array ?? ArgsTypeArray.Empty.Array, null);
+                null, argsTypeArray.Array, null);
 
             ErrorHelper.ThrowNullReferenceException(methodInfo, "Failed to get method information.");
 
