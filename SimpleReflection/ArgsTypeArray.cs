@@ -1,5 +1,6 @@
-﻿
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace SimpleReflection
 {
@@ -10,6 +11,7 @@ namespace SimpleReflection
         public static readonly ArgsTypeArray Empty = new ArgsTypeArray(new Type[] { });
 
         public Type[] Array => argsTypes;
+
         public int Count => argsTypes.Length;
 
         public ArgsTypeArray(Type[] argsTypes)

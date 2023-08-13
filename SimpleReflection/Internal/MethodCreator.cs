@@ -1,6 +1,6 @@
-﻿
-using System;
+﻿using System;
 using System.Collections;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -59,7 +59,7 @@ namespace SimpleReflection.Internal
 
             var instance = _instanceParameter;
             var args = _argsParameter;
-            var ps = methodInfo.GetParameters().Select((x, index) =>
+            var ps = methodInfo!.GetParameters().Select((x, index) =>
                 Expression.Convert(
                     Expression.ArrayIndex(args, Expression.Constant(index)),
                 x.ParameterType)).ToArray();
@@ -90,7 +90,7 @@ namespace SimpleReflection.Internal
         {
             var instance = _instanceParameter;
             var args = _argsParameter;
-            var ps = methodInfo.GetParameters().Select((x, index) =>
+            var ps = methodInfo!.GetParameters().Select((x, index) =>
                 Expression.Convert(
                     Expression.ArrayIndex(args, Expression.Constant(index)),
                 x.ParameterType)).ToArray();

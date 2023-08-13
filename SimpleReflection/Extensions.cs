@@ -1,4 +1,5 @@
-﻿using SimpleReflection.Internal;
+﻿using System;
+using SimpleReflection.Internal;
 
 namespace SimpleReflection
 {
@@ -14,7 +15,9 @@ namespace SimpleReflection
 
         public static ActionInvoker GenerateAction<T>(this T target, string methodName)
         {
-            return target.GetType().GenerateAction(methodName);
+            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
+
+            return target!.GetType().GenerateAction(methodName);
         }
 
         public static ActionInvoker GenerateActionArgs(this Type target, string methodName, ArgsTypeArray argsTypeArray)
@@ -27,10 +30,7 @@ namespace SimpleReflection
 
         public static ActionInvoker GenerateActionArgs<T>(this T target, string methodName, ArgsTypeArray argsTypeArray)
         {
-            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
-
-            var m = MethodCreator.CreateInstance(target.GetType(), methodName, argsTypeArray);
-            return new ActionInvoker(m.method);
+            return target!.GetType().GenerateActionArgs(methodName, argsTypeArray);
         }
 
         public static FunctionInvoker GenerateFunction(this Type target, string methodName)
@@ -43,7 +43,7 @@ namespace SimpleReflection
 
         public static FunctionInvoker GenerateFunction<T>(this T target, string methodName)
         {
-            return target.GetType().GenerateFunction(methodName);
+            return target!.GetType().GenerateFunction(methodName);
         }
 
         public static FunctionInvoker GenerateFunctionArgs(this Type target, string methodName, ArgsTypeArray argsTypeArray)
@@ -56,10 +56,7 @@ namespace SimpleReflection
 
         public static FunctionInvoker GenerateFunctionArgs<T>(this T target, string methodName, ArgsTypeArray argsTypeArray)
         {
-            ErrorHelper.ThrowArgumentNullException(methodName, nameof(methodName));
-
-            var m = MethodCreator.CreateInstance(target.GetType(), methodName, argsTypeArray);
-            return new FunctionInvoker(m.method);
+            return target!.GetType().GenerateFunctionArgs(methodName, argsTypeArray);
         }
 
         public static StaticActionInvoker GenerateStaticAction(this Type target, string methodName)
@@ -110,18 +107,20 @@ namespace SimpleReflection
 
         public static GetPropertyInvoker GenerateGetProperty(this Type target, string propertyName)
         {
+            ErrorHelper.ThrowArgumentNullException(propertyName, nameof(propertyName));
+
             var getProperty = PropertyCreator.CreateGetProperty(target, propertyName);
             return new GetPropertyInvoker(new FunctionInvoker(getProperty));
         }
 
         public static GetPropertyInvoker GenerateGetProperty<T>(this T target, string propertyName)
         {
-            return target.GetType().GenerateGetProperty(propertyName);
+            return target!.GetType().GenerateGetProperty(propertyName);
         }
 
         public static IndexedGetPropertyInvoker GenerateIndexedGetProperty<T>(this T target)
         {
-            return target.GetType().GenerateIndexedGetProperty();
+            return target!.GetType().GenerateIndexedGetProperty();
         }
 
         public static IndexedGetPropertyInvoker GenerateIndexedGetProperty(this Type target)
@@ -133,7 +132,7 @@ namespace SimpleReflection
 
         public static IndexedSetPropertyInvoker GenerateIndexedSetProperty<T>(this T target)
         {
-            return target.GetType().GenerateIndexedSetProperty();
+            return target!.GetType().GenerateIndexedSetProperty();
         }
 
         public static IndexedSetPropertyInvoker GenerateIndexedSetProperty(this Type target)
@@ -145,23 +144,29 @@ namespace SimpleReflection
 
         public static SetPropertyInvoker GenerateSetProperty(this Type target, string propertyName)
         {
+            ErrorHelper.ThrowArgumentNullException(propertyName, nameof(propertyName));
+
             var getProperty = PropertyCreator.CreateSetProperty(target, propertyName);
             return new SetPropertyInvoker(new ActionInvoker(getProperty));
         }
 
         public static SetPropertyInvoker GenerateSetProperty<T>(this T target, string propertyName)
         {
-            return target.GetType().GenerateSetProperty(propertyName);
+            return target!.GetType().GenerateSetProperty(propertyName);
         }
 
         public static StaticGetPropertyInvoker GenerateStaticGetProperty(this Type target, string propertyName)
         {
+            ErrorHelper.ThrowArgumentNullException(propertyName, nameof(propertyName));
+
             var getProperty = PropertyCreator.CreateStaticGetProperty(target, propertyName);
             return new StaticGetPropertyInvoker(new StaticFunctionInvoker(getProperty));
         }
 
         public static StaticSetPropertyInvoker GenerateStaticSetProperty(this Type target, string propertyName)
         {
+            ErrorHelper.ThrowArgumentNullException(propertyName, nameof(propertyName));
+
             var getProperty = PropertyCreator.CreateStaticSetProperty(target, propertyName);
             return new StaticSetPropertyInvoker(new StaticActionInvoker(getProperty));
         }
@@ -184,7 +189,7 @@ namespace SimpleReflection
         {
             ErrorHelper.ThrowArgumentNullException(invoker, nameof(invoker));
             ErrorHelper.ThrowArgumentNullException(indexerParameters, nameof(indexerParameters));
-            ErrorHelper.ThrowNoElementInArray(indexerParameters);
+            ErrorHelper.ThrowNoElementInArray(indexerParameters!);
 
             return invoker.Invoke(target, indexerParameters);
         }
@@ -193,9 +198,9 @@ namespace SimpleReflection
         {
             ErrorHelper.ThrowArgumentNullException(invoker, nameof(invoker));
             ErrorHelper.ThrowArgumentNullException(indexerParameters, nameof(indexerParameters));
-            ErrorHelper.ThrowNoElementInArray(indexerParameters);
+            ErrorHelper.ThrowNoElementInArray(indexerParameters!);
 
-            invoker.Invoke(target, indexerParameters, value);
+            invoker.Invoke(target, value!, indexerParameters);
         }
 
         public sealed class ActionInvoker
@@ -209,7 +214,7 @@ namespace SimpleReflection
 
             public void Invoke<T>(T target, params object[]? parameters)
             {
-                _action.Invoke(target, parameters);
+                _action.Invoke(target!, parameters);
             }
         }
 
@@ -239,7 +244,7 @@ namespace SimpleReflection
 
             public object? Invoke<T>(T target, params object[]? parameters)
             {
-                return _function.Invoke(target, parameters);
+                return _function.Invoke(target!, parameters);
             }
         }
 
@@ -284,7 +289,7 @@ namespace SimpleReflection
 
             public void Invoke<T>(T target, object? value)
             {
-                _setter.Invoke(target, value);
+                _setter.Invoke(target, value!);
             }
         }
 
@@ -314,7 +319,7 @@ namespace SimpleReflection
 
             public void Invoke(object? value)
             {
-                _setter.Invoke(value);
+                _setter.Invoke(value!);
             }
         }
 
@@ -344,7 +349,20 @@ namespace SimpleReflection
 
             public void Invoke<T>(T target, object? value, params object[]? indexerParameters)
             {
-                _setter.Invoke(target, indexerParameters, value);
+                _setter.Invoke(target, this.ConcatArgs(value, indexerParameters));
+            }
+
+            private object[] ConcatArgs(object? value, params object[]? indexerParameters)
+            {
+                var parameterCount = indexerParameters?.Length ?? 0;
+                var args = new object[parameterCount + 1];
+
+                for (int i = 0; i < parameterCount; i++)
+                {
+                    args[i] = indexerParameters![i];
+                }
+                args[indexerParameters?.Length ?? 0] = value!;
+                return args;
             }
         }
 

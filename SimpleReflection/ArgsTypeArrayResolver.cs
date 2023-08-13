@@ -1,4 +1,5 @@
-﻿
+﻿using System;
+
 namespace SimpleReflection.Internal
 {
     public sealed class ArgsTypeArrayResolver
@@ -16,19 +17,18 @@ namespace SimpleReflection.Internal
 
         public static ArgsTypeArray Resolve(params Type[]? args)
         {
-            var argsTypes = new Type[args?.Length ?? 0];
+            ErrorHelper.ThrowArgumentNullException(args, nameof(args));
             for (int i = 0; i < args?.Length; i++)
             {
                 ErrorHelper.ThrowNullReferenceException(args[i], "The argument contains null");
-                argsTypes[i]= args[i];
             }
-            return new ArgsTypeArray(args);
+            return new ArgsTypeArray(args!);
         }
 
-        public static Type ResolveType<T>(T target)
+        private static Type ResolveType<T>(T target)
         {
             if (typeof(T) == typeof(object))
-                return target.GetType();
+                return target!.GetType();
             return typeof(T);
         }
     }
