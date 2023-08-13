@@ -46,4 +46,50 @@ namespace SimpleReflectionTest
         private static int ExecuteStatic2(string strArgs) { return 2; }
     }
 
+    public class TestProperty
+    {
+        public int Prop { get; set; } = 1;
+        public int PropReadOnly => 2;
+        public static int PropStatic { get; set; } = 1;
+        public static int PropReadOnlyStatic => 2;
+    }
+
+    public class TestPrivateProperty
+    {
+        public static readonly int PropValue = 1;
+        public static readonly int PropReadOnlyValue = 2;
+
+        public int PropCheck => this.Prop;
+        public int PropReadOnlyCheck => this.PropReadOnly;
+        public static int PropStaticCheck => PropStatic;
+        public static int PropReadOnlyStaticCheck => PropReadOnlyStatic;
+        private int Prop { get; set; } = 1;
+        private int PropReadOnly => 2;
+        private static int PropStatic { get; set; } = 1;
+        private static int PropReadOnlyStatic => 2;
+    }
+
+    public class TestIndexer
+    {
+        private int[] array = new int[] { 1, 2, 3, 4, 5 };
+
+        public int this[int index]
+        {
+            get => array[index];
+            set => array[index] = value;
+        }
+    }
+
+    public class TestPrivateIndexer
+    {
+        private int[] array = new int[] { 1, 2, 3, 4, 5 };
+
+        public int[] ItemCheck => array;
+
+        private int this[int index]
+        {
+            get => array[index];
+            set => array[index] = value;
+        }
+    }
 }
