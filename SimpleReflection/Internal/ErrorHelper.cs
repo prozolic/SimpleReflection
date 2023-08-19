@@ -3,6 +3,8 @@ using System.Runtime.CompilerServices;
 
 namespace SimpleReflection.Internal
 {
+#nullable enable
+
     internal static class ErrorHelper
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -30,7 +32,7 @@ namespace SimpleReflection.Internal
         {
             if (value.Length == 0) throw new InvalidOperationException("There is no element of anything.");
         }
-
-
     }
+
+#nullable disable
 }

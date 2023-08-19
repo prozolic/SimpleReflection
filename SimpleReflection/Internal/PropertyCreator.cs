@@ -3,6 +3,8 @@ using System.Reflection;
 
 namespace SimpleReflection.Internal
 {
+#nullable enable
+
     internal class PropertyCreator
     {
         public static object CreateGetProperty(Type target, string propertyName)
@@ -50,7 +52,7 @@ namespace SimpleReflection.Internal
 
             ErrorHelper.ThrowNullReferenceException(propertyInfo, "Failed to get property information.");
 
-            return BuildStaticPropertyMethod(propertyInfo?.GetSetMethod(true));
+            return BuildStaticPropertyMethod(propertyInfo!.GetSetMethod(true));
         }
 
         private static object BuildPropertyMethod(Type target, MethodInfo? propertyInfo)
@@ -61,9 +63,10 @@ namespace SimpleReflection.Internal
 
         private static object BuildStaticPropertyMethod(MethodInfo? propertyInfo)
         {
-            var m = MethodCreator.BuildStaticMethod(propertyInfo);
-            return m.method;
+            var (method, type) = MethodCreator.BuildStaticMethod(propertyInfo);
+            return method;
         }
-
     }
+
+#nullable disable
 }

@@ -3,6 +3,7 @@ using SimpleReflection.Internal;
 
 namespace SimpleReflection
 {
+#nullable enable
     public sealed class ArgsTypeArrayResolver
     {
         public static ArgsTypeArray ResolveRealParameter(params object[]? args)
@@ -19,7 +20,8 @@ namespace SimpleReflection
         public static ArgsTypeArray Resolve(params Type[]? args)
         {
             ErrorHelper.ThrowArgumentNullException(args, nameof(args));
-            for (int i = 0; i < args?.Length; i++)
+
+            for (int i = 0; i < args!.Length; i++)
             {
                 ErrorHelper.ThrowNullReferenceException(args[i], "The argument contains null");
             }
@@ -33,4 +35,6 @@ namespace SimpleReflection
             return typeof(T);
         }
     }
+
+#nullable disable
 }

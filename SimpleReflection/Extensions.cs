@@ -3,6 +3,7 @@ using SimpleReflection.Internal;
 
 namespace SimpleReflection
 {
+#nullable enable
     public static class Extensions
     {
         public static ActionInvoker GenerateAction(this Type target, string methodName)
@@ -203,4 +204,5 @@ namespace SimpleReflection
             invoker.Invoke(target, value!, indexerParameters);
         }
     }
+#nullable disable
 }

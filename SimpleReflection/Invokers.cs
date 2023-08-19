@@ -2,6 +2,7 @@
 
 namespace SimpleReflection
 {
+#nullable enable
     public sealed class ActionInvoker
     {
         private readonly Action<object, object[]?> _action;
@@ -165,4 +166,5 @@ namespace SimpleReflection
         }
     }
 
+#nullable disable
 }

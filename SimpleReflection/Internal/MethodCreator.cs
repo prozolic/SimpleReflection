@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace SimpleReflection.Internal
 {
+#nullable enable
+
     internal sealed class MethodCreator
     {
         private static readonly ParameterExpression _instanceParameter = Expression.Parameter(typeof(object), "instance");
@@ -118,6 +119,7 @@ namespace SimpleReflection.Internal
                 return (lambda, DelegateType.Function);
             }
         }
-
     }
+
+#nullable disable
 }
