@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleReflection", "SimpleReflection\SimpleReflection.csproj", "{FC6C9A2F-D3B6-4C6A-9283-4D5A5B9F854C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleReflection", "SimpleReflection\SimpleReflection.csproj", "{FC6C9A2F-D3B6-4C6A-9283-4D5A5B9F854C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleReflectionTest", "SimpleReflectionTest\SimpleReflectionTest.csproj", "{25EFC6B4-E8C3-4D8D-96F1-F136B61A11FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleReflectionTest", "SimpleReflectionTest\SimpleReflectionTest.csproj", "{25EFC6B4-E8C3-4D8D-96F1-F136B61A11FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleReflection.BenchmarkTest", "SimpleReflection.BenchmarkTest\SimpleReflection.BenchmarkTest.csproj", "{2707C322-10C9-4FDA-9C69-8F3354F16838}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{25EFC6B4-E8C3-4D8D-96F1-F136B61A11FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{25EFC6B4-E8C3-4D8D-96F1-F136B61A11FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{25EFC6B4-E8C3-4D8D-96F1-F136B61A11FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2707C322-10C9-4FDA-9C69-8F3354F16838}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2707C322-10C9-4FDA-9C69-8F3354F16838}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2707C322-10C9-4FDA-9C69-8F3354F16838}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2707C322-10C9-4FDA-9C69-8F3354F16838}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
